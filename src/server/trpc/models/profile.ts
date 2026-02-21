@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const updateProfileSchema = z.object({
+export const BaseProfileSchema = z.object({
   username: z.string().min(3).max(20).optional(),
   avatar: z.string().url().optional(),
   socialLinks: z.object({
@@ -27,7 +27,7 @@ export const ProfileUpdateResultSchema = z.discriminatedUnion("success", [
 ]);
 
 
-export type UpdateProfileInput     = z.infer<typeof updateProfileSchema>;
+export type UpdateProfileInput     = z.infer<typeof BaseProfileSchema>;
 export type ProfileUpdateSuccess   = z.infer<typeof profileUpdateSuccessResponse>;
 export type ProfileUpdateError     = z.infer<typeof profileUpdateErrorResponse>;
 export type ProfileUpdateResult    = z.infer<typeof ProfileUpdateResultSchema>;

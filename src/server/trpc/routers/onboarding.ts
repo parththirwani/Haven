@@ -5,12 +5,6 @@ import { protectedProcedure, router } from "../trpc";
 import { prisma } from '@/src/lib/prisma';
 
 export const onboardingRouter = router({
-  /**
-   * Returns whether this user has completed onboarding.
-   * Frontend uses this after sign-in to decide: onboarding flow vs vault unlock.
-   * keySalt is returned so the client can re-derive the master key without
-   * ever having seen it on the server.
-   */
   getStatus: protectedProcedure
     .output(
       z.object({

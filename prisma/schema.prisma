@@ -8,21 +8,26 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  username    String       @unique
-  email       String       @unique
+  id          String   @id @default(uuid())
+  username    String   @unique
+  email       String   @unique
   password    String
   avatar      String?
   keySalt     String?
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   socialLinks Json?
-  items       Item[]
+
+  vaultItems  VaultItem[]
+  notes       Note[]
+  links       Link[]
+  resources   Resource[]
+  passwords   Password[]
   attachments Attachment[]
   audits      AuditLog[]
-  sessions  Session[]
+  sessions    Session[]
 }
 
 model Session {
@@ -36,32 +41,34 @@ model Session {
   @@index([userId])
 }
 
+model VaultItem {
+  id        String    @id @default(uuid())
+  userId    String
+  type      ItemType
+  count     Int?
 
-model Item {
-  id             String       @id @default(uuid())
-  userId         String
-  type           ItemType
+  titleEnc  String
 
-  titleEnc       String
-  contentEnc     String?
-  metadataEnc    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
-  // Added: back-relation from AuditLog → Attachment (optional many-to-one)
-  linkedItems    Item[]       @relation("ItemLinks")
-  linkedByItems  Item[]       @relation("ItemLinks")
+  user      User      @relation(fields: [userId], references: [id])
 
-  attachments    Attachment[]
+  note      Note?
+  link      Link?
+  resource  Resource?
+  password  Password?
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  deletedAt      DateTime?
-
-  user           User         @relation(fields: [userId], references: [id])
-  audits         AuditLog[]
+  attachments  Attachment[]
+  audits       AuditLog[]
+  linksTo      ItemLink[] @relation("LinkSource")
+  linkedFrom   ItemLink[] @relation("LinkTarget")
 
   @@index([userId])
-  @@index([type])
-  @@index([deletedAt])
+  @@index([userId, type])
+  @@index([userId, deletedAt])
+  @@index([userId, type, deletedAt])
 }
 
 enum ItemType {
@@ -69,52 +76,166 @@ enum ItemType {
   LINK
   RESOURCE
   PASSWORD
-  TODO
-  JOURNAL
 }
 
-model Attachment {
-  id             String       @id @default(uuid())
-  itemId         String
+model Note {
+  id          String    @id @default(uuid())
+  vaultItemId String    @unique
+  userId      String
+
+  titleEnc    String?
+  contentEnc  String
+  previewEnc  String?
+  tagsEnc     String?
+
+  isPinned    Boolean   @default(false)
+  wordCount   Int?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  vaultItem   VaultItem @relation(fields: [vaultItemId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([userId, isPinned])
+}
+
+model Link {
+  id             String    @id @default(uuid())
+  vaultItemId    String    @unique
   userId         String
 
-  metadataEnc    String
-  filePath       String?
-  fileHash       String?
-  mimeType       String?
-  sizeBytes      Int?
+  urlEnc         String
+  descriptionEnc String?
+  tagsEnc        String?
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  faviconUrl     String?
+  siteName       String?
 
-  item           Item         @relation(fields: [itemId], references: [id])
-  user           User         @relation(fields: [userId], references: [id])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  audits         AuditLog[]
+  vaultItem      VaultItem @relation(fields: [vaultItemId], references: [id], onDelete: Cascade)
+  user           User      @relation(fields: [userId], references: [id])
 
-  @@index([itemId])
   @@index([userId])
 }
 
+model Resource {
+  id            String       @id @default(uuid())
+  vaultItemId   String       @unique
+  userId        String
+
+  titleEnc      String?
+  contentEnc    String
+  sourceUrlEnc  String?
+  authorEnc     String?
+  tagsEnc       String?
+
+  resourceType  ResourceType @default(ARTICLE)
+  publishedAt   DateTime?
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  vaultItem     VaultItem    @relation(fields: [vaultItemId], references: [id], onDelete: Cascade)
+  user          User         @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([userId, resourceType])
+}
+
+enum ResourceType {
+  ARTICLE
+  PAPER
+  BOOK
+  VIDEO
+  PODCAST
+  OTHER
+}
+
+model Password {
+  id               String    @id @default(uuid())
+  vaultItemId      String    @unique
+  userId           String
+
+  usernameEnc      String
+  passwordEnc      String
+  urlEnc           String?
+  notesEnc         String?
+  totpSecretEnc    String?
+
+  passwordStrength Int?
+  lastUsedAt       DateTime?
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  vaultItem        VaultItem @relation(fields: [vaultItemId], references: [id], onDelete: Cascade)
+  user             User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([userId, passwordStrength])
+}
+
+model Attachment {
+  id          String    @id @default(uuid())
+  vaultItemId String
+  userId      String
+
+  metadataEnc String
+  filePath    String?
+  fileHash    String?
+  mimeType    String?
+  sizeBytes   Int?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  vaultItem   VaultItem  @relation(fields: [vaultItemId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id])
+  audits      AuditLog[]
+
+  @@index([vaultItemId])
+  @@index([userId])
+}
+
+model ItemLink {
+  id            String    @id @default(uuid())
+  sourceId      String
+  targetId      String
+  annotationEnc String?
+
+  createdAt     DateTime  @default(now())
+
+  source        VaultItem @relation("LinkSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  target        VaultItem @relation("LinkTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId])
+  @@index([sourceId])
+  @@index([targetId])
+}
+
 model AuditLog {
-  id           String       @id @default(uuid())
+  id           String      @id @default(uuid())
   userId       String
-  itemId       String?
+  vaultItemId  String?
   attachmentId String?
 
   action       AuditAction
-  timestamp    DateTime     @default(now())
+  timestamp    DateTime    @default(now())
   details      Json?
 
   prevHash     String?
   hash         String
 
-  user         User         @relation(fields: [userId], references: [id])
-  item         Item?        @relation(fields: [itemId], references: [id])
-  attachment   Attachment?  @relation(fields: [attachmentId], references: [id])
+  user         User        @relation(fields: [userId], references: [id])
+  vaultItem    VaultItem?  @relation(fields: [vaultItemId], references: [id])
+  attachment   Attachment? @relation(fields: [attachmentId], references: [id])
 
   @@index([userId, timestamp(sort: Desc)])
-  @@index([itemId])
+  @@index([vaultItemId])
 }
 
 enum AuditAction {
@@ -124,4 +245,6 @@ enum AuditAction {
   DELETE
   ATTACH_FILE
   DOWNLOAD_FILE
+  LINK_CREATED
+  LINK_REMOVED
 }

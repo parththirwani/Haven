@@ -28,7 +28,7 @@ export const onboardingRouter = router({
                 keySalt
             };
         }catch(err){
-            console.error("Onboarding Error"+err)
+            console.error("Onboarding Error "+err)
         }return{
             success: false,
             message:"Failed to complete onboarding"

@@ -15,7 +15,7 @@ import {
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 
-export const itemRouter = router({
+export const vaultRouter = router({
   listItems: protectedProcedure
     .input(ListItemsInput)
     .output(ListItemsOutput)

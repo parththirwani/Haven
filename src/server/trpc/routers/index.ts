@@ -8,7 +8,7 @@ const appRouter = router({
   auth: authRouter,
   onboarding: onboardingRouter,
   profile: profileRouter,
-  vault: vaultRouter
+  vault: vaultRouter,
 });
 
 export type AppRouter = typeof appRouter;

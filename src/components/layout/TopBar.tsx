@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Plus, Shield } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Search, Plus, Shield, Lock } from "lucide-react";
+import { motion } from "framer-motion";
 import { useVault } from "@/src/stores/useVault";
 
 interface TopBarProps {
@@ -25,7 +25,7 @@ export function TopBar({ title, onNewItem, newItemLabel = "New" }: TopBarProps) 
         <div className="relative">
           <Search
             size={13}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600"
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none"
           />
           <input
             type="text"
@@ -43,9 +43,23 @@ export function TopBar({ title, onNewItem, newItemLabel = "New" }: TopBarProps) 
         </div>
 
         {/* Vault status */}
-        <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/2 border border-white/6">
-          <Shield size={11} className={isUnlocked ? "text-emerald-400" : "text-zinc-600"} />
-          <span className={`text-[10px] ${isUnlocked ? "text-emerald-400" : "text-zinc-600"}`}>
+        <div
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-md border transition-all ${
+            isUnlocked
+              ? "bg-emerald-500/5 border-emerald-500/15"
+              : "bg-white/2 border-white/6"
+          }`}
+        >
+          {isUnlocked ? (
+            <Shield size={11} className="text-emerald-400" />
+          ) : (
+            <Lock size={11} className="text-zinc-600" />
+          )}
+          <span
+            className={`text-[10px] ${
+              isUnlocked ? "text-emerald-400" : "text-zinc-600"
+            }`}
+          >
             {isUnlocked ? "Unlocked" : "Locked"}
           </span>
         </div>

@@ -1,7 +1,7 @@
 # Haven
 
 A privacy-first, local-first second brain.  
-All your notes, links, resources, files and passwords — end-to-end encrypted on the client before they ever leave your device.
+All your notes, links, resources, files and passwords end-to-end encrypted on the client before they ever leave your device.
 
 The server only ever sees ciphertext.
 

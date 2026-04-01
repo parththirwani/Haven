@@ -1,5 +1,4 @@
 "use client";
-
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
@@ -7,42 +6,60 @@ import { ArrowRight, Github } from "lucide-react";
 
 export function CTASection() {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="py-32 px-6 border-t border-white/6">
-      <div className="max-w-2xl mx-auto text-center">
+    <section ref={ref} className="relative py-32 px-6 border-t border-white/5 overflow-hidden">
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-linear-to-b from-transparent via-indigo-950/30 to-transparent pointer-events-none" />
+
+      <div className="max-w-xl mx-auto text-center relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div
-            className="inline-block mb-8 w-14 h-14 rounded-2xl border border-indigo-500/20 bg-indigo-500/8 items-center justify-center"
-            style={{ animation: "float 4s ease-in-out infinite" }}
-          >
-            <span className="text-2xl">🔐</span>
+          {/* Elegant icon with glow */}
+          <div className="mx-auto mb-12 flex items-center justify-center">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 bg-linear-to-br from-indigo-500 via-purple-500 to-violet-500 rounded-3xl blur-xl opacity-20" />
+              <div className="relative w-20 h-20 rounded-3xl border border-white/10 bg-zinc-950/80 backdrop-blur-xl flex items-center justify-center shadow-2xl">
+                <span className="text-4xl drop-shadow-sm">🔐</span>
+              </div>
+            </div>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-white mb-6">
-            Start keeping secrets
+          <h2 className="text-6xl sm:text-7xl font-light tracking-tighter text-white mb-8">
+            Start keeping<br />your secrets safe
           </h2>
-          <p className="text-zinc-400 font-light max-w-md mx-auto mb-10">
-            Free forever for personal use. No credit card required. No data harvested.
+
+          <p className="text-xl text-zinc-400 font-light max-w-md mx-auto mb-14 leading-relaxed">
+            Beautifully private. Free forever.<br />
+            No ads. No tracking. Just yours.
           </p>
 
-          <div className="flex items-center justify-center gap-4">
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.985 }}
+          >
             <Link
               href="/signup"
-              className="group flex items-center gap-2 px-6 py-3 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium transition-all duration-200 glow-accent"
+              className="group relative inline-flex items-center gap-3 px-10 py-5 text-lg font-medium rounded-2xl
+                         bg-white text-zinc-950 overflow-hidden transition-all duration-500
+                         hover:shadow-2xl hover:shadow-indigo-500/20"
             >
-              Create your vault
-              <ArrowRight
-                size={14}
-                className="group-hover:translate-x-0.5 transition-transform"
-              />
+              <span className="relative z-10 flex items-center gap-3">
+                Create your vault
+                <ArrowRight 
+                  size={22} 
+                  className="group-hover:translate-x-1 transition-transform duration-300" 
+                />
+              </span>
+              
+              {/* Subtle shine effect */}
+              <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent -skew-x-12 translate-x-[-150%] group-hover:translate-x-[150%] transition-transform duration-700" />
             </Link>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

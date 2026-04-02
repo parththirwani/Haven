@@ -1,13 +1,15 @@
-name: PR-Agent
+name: PR Agent
 
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize]
   issue_comment:
+    types: [created]
 
 permissions:
   issues: write
   pull-requests: write
+  contents: write
 
 jobs:
   pr_agent_job:
@@ -17,12 +19,4 @@ jobs:
         uses: Codium-ai/pr-agent@main
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
-          OPENAI.API_BASE: ${{ secrets.OPENAI_API_BASE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CONFIG.MODEL: ${{ secrets.CONFIG_MODEL }}
-          CONFIG.CUSTOM_MODEL_MAX_TOKENS: 32000
-          CONFIG.FALLBACK_MODELS: '[]'
-          GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: true
-          GITHUB_ACTION_CONFIG.AUTO_REVIEW: true
-          GITHUB_ACTION_CONFIG.AUTO_IMPROVE: true
-          GITHUB_ACTION_CONFIG.PR_ACTIONS: '["opened", "reopened", "ready_for_review", "synchronize"]'

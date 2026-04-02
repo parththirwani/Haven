@@ -1,0 +1,28 @@
+[config]
+model = "bodh/b0"
+custom_model_max_tokens = 32000
+fallback_models = []
+ai_timeout = 400
+verbosity_level = 0
+publish_output = true
+
+[github_action_config]
+auto_describe = true
+auto_review = true
+auto_improve = true
+pr_actions = ["opened", "reopened", "ready_for_review", "synchronize"]
+
+[pr_description]
+enable_large_pr_handling = false
+
+[pr_code_suggestions]
+max_number_of_calls = 1
+parallel_calls = false
+focus_only_on_problems = true
+
+[pr_reviewer]
+num_max_findings = 3
+require_tests_review = false
+require_security_review = false
+require_ticket_analysis_review = false
+

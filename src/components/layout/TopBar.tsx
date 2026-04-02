@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Search, Plus, Shield, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useVault } from "@/src/stores/useVault";
@@ -11,17 +11,31 @@ interface TopBarProps {
   newItemLabel?: string;
 }
 
-export function TopBar({ title, onNewItem, newItemLabel = "New" }: TopBarProps) {
+export function TopBar({ 
+  title, 
+  onNewItem, 
+  newItemLabel = "New" 
+}: TopBarProps) {
+  
   const [searchFocused, setSearchFocused] = useState(false);
   const [query, setQuery] = useState("");
+  
   const { isUnlocked } = useVault();
+
+  // Memoized handlers to prevent unnecessary re-renders
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  }, []);
+
+  const handleFocus = useCallback(() => setSearchFocused(true), []);
+  const handleBlur = useCallback(() => setSearchFocused(false), []);
 
   return (
     <header className="flex items-center justify-between px-6 py-3 border-b border-white/6 bg-[#090909]/50 backdrop-blur-sm sticky top-0 z-10">
       <h1 className="text-sm font-medium text-zinc-300">{title}</h1>
 
       <div className="flex items-center gap-3">
-        {/* Search */}
+        {/* Search Input */}
         <div className="relative">
           <Search
             size={13}
@@ -30,19 +44,19 @@ export function TopBar({ title, onNewItem, newItemLabel = "New" }: TopBarProps) 
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
+            onChange={handleSearchChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             placeholder="Search…"
-            className={`pl-8 pr-3 py-1.5 text-xs rounded-lg border transition-all duration-200 outline-none bg-white/3 text-zinc-300 placeholder-zinc-600 ${
-              searchFocused
-                ? "border-indigo-500/40 w-52 bg-white/5"
-                : "border-white/6 w-36"
-            }`}
+            className={`pl-8 pr-3 py-1.5 text-xs rounded-lg border transition-all duration-200 outline-none bg-white/3 text-zinc-300 placeholder-zinc-600 w-36
+              ${searchFocused 
+                ? "border-indigo-500/40 w-52 bg-white/5" 
+                : "border-white/6"
+              }`}
           />
         </div>
 
-        {/* Vault status */}
+        {/* Vault Status */}
         <div
           className={`flex items-center gap-1.5 px-2 py-1 rounded-md border transition-all ${
             isUnlocked
@@ -64,13 +78,13 @@ export function TopBar({ title, onNewItem, newItemLabel = "New" }: TopBarProps) 
           </span>
         </div>
 
-        {/* New item button */}
+        {/* New Item Button */}
         {onNewItem && (
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onNewItem}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-medium transition-all duration-200"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-medium transition-all duration-200 active:bg-indigo-600"
           >
             <Plus size={12} />
             {newItemLabel}

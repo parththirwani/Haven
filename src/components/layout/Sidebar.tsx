@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   FileText,
   Link2,
@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import { api } from "@/src/trpc/react";
 import { useVault } from "@/src/stores/useVault";
-import { useRouter } from "next/navigation";
 
 const navItems = [
   { href: "/web/notes", icon: FileText, label: "Notes" },
@@ -50,6 +49,12 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
     },
   });
 
+  // Helper to check active route
+  const isActive = (href: string, exact = false): boolean => {
+    if (exact) return pathname === href;
+    return pathname === href || pathname.startsWith(href + "/");
+  };
+
   return (
     <motion.aside
       initial={{ x: -20, opacity: 0 }}
@@ -65,13 +70,14 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
         <span className="text-sm font-medium text-zinc-300">Haven</span>
       </div>
 
-      {/* Main nav */}
+      {/* Main Navigation */}
       <nav className="flex-1 space-y-0.5">
         <p className="px-2 mb-2 text-[10px] font-medium tracking-widest text-zinc-600 uppercase">
           Vault
         </p>
+
         {navItems.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + "/");
+          const active = isActive(item.href);
           return (
             <Link
               key={item.href}
@@ -84,9 +90,11 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             >
               <item.icon
                 size={14}
-                className={active ? "text-indigo-400" : "text-zinc-600 group-hover:text-zinc-400"}
+                className={
+                  active ? "text-indigo-400" : "text-zinc-600 group-hover:text-zinc-400"
+                }
               />
-              {item.label}
+              <span>{item.label}</span>
               {active && (
                 <ChevronRight size={10} className="ml-auto text-indigo-500/60" />
               )}
@@ -94,12 +102,14 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
           );
         })}
 
+        {/* Explore Section */}
         <div className="pt-4">
           <p className="px-2 mb-2 text-[10px] font-medium tracking-widest text-zinc-600 uppercase">
             Explore
           </p>
+
           {bottomItems.map((item) => {
-            const active = pathname === item.href;
+            const active = isActive(item.href, true);
             return (
               <Link
                 key={item.href}
@@ -112,20 +122,23 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
               >
                 <item.icon
                   size={14}
-                  className={active ? "text-indigo-400" : "text-zinc-600 group-hover:text-zinc-400"}
+                  className={
+                    active ? "text-indigo-400" : "text-zinc-600 group-hover:text-zinc-400"
+                  }
                 />
-                {item.label}
+                <span>{item.label}</span>
               </Link>
             );
           })}
         </div>
       </nav>
 
-      {/* Bottom — user / lock */}
+      {/* Bottom Section - Sign Out */}
       <div className="border-t border-white/6 pt-3 mt-3 space-y-1">
         <button
           onClick={() => signout.mutate()}
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-400 hover:bg-white/3 transition-all"
+          disabled={signout.isPending}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-400 hover:bg-white/3 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <LogOut size={13} />
           Sign out

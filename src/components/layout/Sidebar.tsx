@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   FileText,
   Link2,
@@ -16,9 +17,9 @@ import {
   LogOut,
   ChevronRight,
 } from "lucide-react";
+
 import { api } from "@/src/trpc/react";
 import { useVault } from "@/src/stores/useVault";
-import { useRouter } from "next/navigation";
 
 const navItems = [
   { href: "/web/notes", icon: FileText, label: "Notes" },
@@ -43,12 +44,60 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   const router = useRouter();
   const { lockVault } = useVault();
 
-  const signout = api.auth.signout.useMutation({
+  const signoutMutation = api.auth.signout.useMutation({
     onSuccess: () => {
       lockVault();
       router.push("/login");
     },
   });
+
+  // Helper to check if a route is active
+  const isActive = (href: string, exact = false): boolean => {
+    if (exact) return pathname === href;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  // Reusable NavLink component to eliminate duplication
+  const NavLink = ({
+    href,
+    icon: Icon,
+    label,
+    exact = false,
+  }: {
+    href: string;
+    icon: React.ComponentType<{ size?: number; className?: string }>;
+    label: string;
+    exact?: boolean;
+  }) => {
+    const active = isActive(href, exact);
+
+    return (
+      <Link
+        href={href}
+        className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 ${
+          active
+            ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/15"
+            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/3"
+        }`}
+      >
+        <Icon
+          size={14}
+          className={
+            active
+              ? "text-indigo-400"
+              : "text-zinc-600 group-hover:text-zinc-400"
+          }
+        />
+        <span>{label}</span>
+        {active && (
+          <ChevronRight
+            size={10}
+            className="ml-auto text-indigo-500/60"
+          />
+        )}
+      </Link>
+    );
+  };
 
   return (
     <motion.aside
@@ -65,67 +114,44 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
         <span className="text-sm font-medium text-zinc-300">Haven</span>
       </div>
 
-      {/* Main nav */}
+      {/* Main Navigation */}
       <nav className="flex-1 space-y-0.5">
         <p className="px-2 mb-2 text-[10px] font-medium tracking-widest text-zinc-600 uppercase">
           Vault
         </p>
-        {navItems.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + "/");
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 ${
-                active
-                  ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/15"
-                  : "text-zinc-500 hover:text-zinc-300 hover:bg-white/3"
-              }`}
-            >
-              <item.icon
-                size={14}
-                className={active ? "text-indigo-400" : "text-zinc-600 group-hover:text-zinc-400"}
-              />
-              {item.label}
-              {active && (
-                <ChevronRight size={10} className="ml-auto text-indigo-500/60" />
-              )}
-            </Link>
-          );
-        })}
+
+        {navItems.map((item) => (
+          <NavLink
+            key={item.href}
+            href={item.href}
+            icon={item.icon}
+            label={item.label}
+          />
+        ))}
 
         <div className="pt-4">
           <p className="px-2 mb-2 text-[10px] font-medium tracking-widest text-zinc-600 uppercase">
             Explore
           </p>
-          {bottomItems.map((item) => {
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 ${
-                  active
-                    ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/15"
-                    : "text-zinc-500 hover:text-zinc-300 hover:bg-white/3"
-                }`}
-              >
-                <item.icon
-                  size={14}
-                  className={active ? "text-indigo-400" : "text-zinc-600 group-hover:text-zinc-400"}
-                />
-                {item.label}
-              </Link>
-            );
-          })}
+
+          {bottomItems.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              exact // Graph, Audit, Trash are exact matches
+            />
+          ))}
         </div>
       </nav>
 
-      {/* Bottom — user / lock */}
+      {/* Bottom Section */}
       <div className="border-t border-white/6 pt-3 mt-3 space-y-1">
         <button
-          onClick={() => signout.mutate()}
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-400 hover:bg-white/3 transition-all"
+          onClick={() => signoutMutation.mutate()}
+          disabled={signoutMutation.isPending}
+          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-400 hover:bg-white/3 transition-all disabled:opacity-50"
         >
           <LogOut size={13} />
           Sign out

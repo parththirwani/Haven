@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Search, Plus, Shield, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useVault } from "@/src/stores/useVault";
@@ -11,72 +11,100 @@ interface TopBarProps {
   newItemLabel?: string;
 }
 
-export function TopBar({ title, onNewItem, newItemLabel = "New" }: TopBarProps) {
-  const [searchFocused, setSearchFocused] = useState(false);
+export function TopBar({ 
+  title, 
+  onNewItem, 
+  newItemLabel = "New" 
+}: TopBarProps) {
+  
   const [query, setQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  
   const { isUnlocked } = useVault();
 
+  // Optional: Add debounce if you plan to search onChange later
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    // You can add debounced search logic here in the future
+  }, []);
+
   return (
-    <header className="flex items-center justify-between px-6 py-3 border-b border-white/6 bg-[#090909]/50 backdrop-blur-sm sticky top-0 z-10">
-      <h1 className="text-sm font-medium text-zinc-300">{title}</h1>
+    <header className="flex items-center justify-between px-6 py-3 border-b border-white/6 bg-[#090909]/80 backdrop-blur-md sticky top-0 z-20">
+      
+      {/* Title */}
+      <h1 className="text-sm font-medium text-zinc-300 tracking-tight">
+        {title}
+      </h1>
 
       <div className="flex items-center gap-3">
-        {/* Search */}
-        <div className="relative">
+        
+        {/* Search Bar */}
+        <div className="relative group">
           <Search
             size={13}
-            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-600 pointer-events-none"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none"
           />
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
+            onChange={handleSearchChange}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
             placeholder="Search…"
-            className={`pl-8 pr-3 py-1.5 text-xs rounded-lg border transition-all duration-200 outline-none bg-white/3 text-zinc-300 placeholder-zinc-600 ${
-              searchFocused
-                ? "border-indigo-500/40 w-52 bg-white/5"
-                : "border-white/6 w-36"
-            }`}
+            aria-label="Search vault items"
+            className={`pl-9 pr-4 py-1.5 text-xs rounded-xl border transition-all duration-200 
+              outline-none bg-white/5 text-zinc-200 placeholder-zinc-500
+              focus:bg-white/10
+              ${isSearchFocused 
+                ? "border-indigo-500/50 w-60 shadow-sm" 
+                : "border-white/10 w-44 hover:border-white/20"
+              }`}
           />
         </div>
 
-        {/* Vault status */}
-        <div
-          className={`flex items-center gap-1.5 px-2 py-1 rounded-md border transition-all ${
-            isUnlocked
-              ? "bg-emerald-500/5 border-emerald-500/15"
-              : "bg-white/2 border-white/6"
-          }`}
-        >
-          {isUnlocked ? (
-            <Shield size={11} className="text-emerald-400" />
-          ) : (
-            <Lock size={11} className="text-zinc-600" />
-          )}
-          <span
-            className={`text-[10px] ${
-              isUnlocked ? "text-emerald-400" : "text-zinc-600"
-            }`}
-          >
-            {isUnlocked ? "Unlocked" : "Locked"}
-          </span>
-        </div>
+        {/* Vault Status Indicator */}
+        <VaultStatus isUnlocked={isUnlocked} />
 
-        {/* New item button */}
+        {/* New Item Button */}
         {onNewItem && (
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             onClick={onNewItem}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-medium transition-all duration-200"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl 
+                       bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 
+                       text-white text-xs font-medium transition-colors duration-200
+                       shadow-sm shadow-indigo-500/20"
+            aria-label={`Create new ${newItemLabel.toLowerCase()}`}
           >
-            <Plus size={12} />
+            <Plus size={13} strokeWidth={3} />
             {newItemLabel}
           </motion.button>
         )}
       </div>
     </header>
+  );
+}
+
+interface VaultStatusProps {
+  isUnlocked: boolean;
+}
+
+function VaultStatus({ isUnlocked }: VaultStatusProps) {
+  return (
+    <div
+      className={`flex items-center gap-1.5 px-3 py-1 rounded-xl border text-[10px] font-medium transition-all ${
+        isUnlocked
+          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+          : "bg-zinc-900/50 border-white/10 text-zinc-500"
+      }`}
+    >
+      {isUnlocked ? (
+        <Shield size={12} className="text-emerald-400" />
+      ) : (
+        <Lock size={12} className="text-zinc-600" />
+      )}
+      <span>{isUnlocked ? "Unlocked" : "Locked"}</span>
+    </div>
   );
 }

@@ -3,7 +3,6 @@ model = "bodh-b0"
 custom_model_max_tokens = 32000
 fallback_models = []
 ai_timeout = 400
-verbosity_level = 0
 publish_output = true
 
 [github_action_config]

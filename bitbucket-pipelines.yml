@@ -1,0 +1,36 @@
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: PR Agent Review
+          # Uses your self-hosted runner (free, no build minutes used)
+          runs-on:
+            - self.hosted
+            - linux
+          # Official PR Agent Docker image
+          image: codiumai/pr-agent:latest
+          script:
+            # Build the PR URL using Bitbucket's built-in variables
+            - export PR_URL="https://bitbucket.org/${BITBUCKET_WORKSPACE}/${BITBUCKET_REPO_SLUG}/pull-requests/${BITBUCKET_PR_ID}"
+
+            # Tell PR Agent to use Bitbucket as the git provider
+            - export CONFIG__GIT_PROVIDER="bitbucket"
+
+            # AI model configuration - change model name here if needed
+            - export CONFIG__MODEL="openai/bodh-b0"
+            - export CONFIG__CUSTOM_MODEL_MAX_TOKENS="32000"
+            - export CONFIG__AI_TIMEOUT="400"
+
+            # Bitbucket auth - uses BITBUCKET_TOKEN from Repository Variables
+            - export BITBUCKET__BEARER_TOKEN="${BITBUCKET_TOKEN}"
+
+            # AI API auth - maps OPENAI_KEY (repo variable) to OPENAI_API_KEY (what LiteLLM expects)
+            - export OPENAI_API_KEY="${OPENAI_KEY}"
+
+            # Your custom LiteLLM base URL - set OPENAI_API_BASE in Repository Variables
+            - export OPENAI_API_BASE="${OPENAI_API_BASE}"
+
+            # Run all three PR Agent commands
+            - pr-agent --pr_url="$PR_URL" describe
+            - pr-agent --pr_url="$PR_URL" review
+            - pr-agent --pr_url="$PR_URL" improve

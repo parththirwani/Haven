@@ -20,3 +20,5 @@ jobs:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
           OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONFIG.AI_TIMEOUT: "480"
+          CONFIG.CUSTOM_MODEL_MAX_TOKENS: "4000"

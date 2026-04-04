@@ -1,9 +1,8 @@
 [config]
 model = "openai/bodh-b0"
-custom_model_max_tokens = 16000
+custom_model_max_tokens = 8000
 fallback_models = []
-ai_timeout = 120
-publish_output = true
+ai_timeout = 480
 
 [github_action_config]
 auto_describe = true
@@ -18,7 +17,7 @@ max_ai_calls = 1
 
 [pr_code_suggestions]
 max_number_of_calls = 1
-parallel_calls = true
+parallel_calls = false
 focus_only_on_problems = true
 
 [pr_reviewer]

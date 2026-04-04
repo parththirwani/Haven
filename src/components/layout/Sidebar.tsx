@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import React from "react";
+
 import {
   FileText,
   Link2,
@@ -47,78 +49,87 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   const signoutMutation = api.auth.signout.useMutation({
     onSuccess: () => {
       lockVault();
-      router.push("/login");
+      router.replace("/login"); // replace is better than push for auth
     },
   });
 
-  // Helper to check if a route is active
+  // Active route checker
   const isActive = (href: string, exact = false): boolean => {
     if (exact) return pathname === href;
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
-  // Reusable NavLink component to eliminate duplication
-  const NavLink = ({
-    href,
-    icon: Icon,
-    label,
-    exact = false,
-  }: {
-    href: string;
-    icon: React.ComponentType<{ size?: number; className?: string }>;
-    label: string;
-    exact?: boolean;
-  }) => {
-    const active = isActive(href, exact);
+  // Reusable NavLink (memoized for performance)
+  const NavLink = React.memo(
+    ({
+      href,
+      icon: Icon,
+      label,
+      exact = false,
+    }: {
+      href: string;
+      icon: React.ComponentType<{ size?: number; className?: string }>;
+      label: string;
+      exact?: boolean;
+    }) => {
+      const active = isActive(href, exact);
 
-    return (
-      <Link
-        href={href}
-        className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-all duration-150 ${
-          active
-            ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/15"
-            : "text-zinc-500 hover:text-zinc-300 hover:bg-white/3"
-        }`}
-      >
-        <Icon
-          size={14}
-          className={
+      return (
+        <Link
+          href={href}
+          className={`group flex items-center gap-2.5 px-2.5 py-2.5 rounded-xl text-sm transition-all duration-200 ${
             active
-              ? "text-indigo-400"
-              : "text-zinc-600 group-hover:text-zinc-400"
-          }
-        />
-        <span>{label}</span>
-        {active && (
-          <ChevronRight
-            size={10}
-            className="ml-auto text-indigo-500/60"
+              ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
+              : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
+          }`}
+        >
+          <Icon
+            size={15}
+            className={
+              active
+                ? "text-indigo-400"
+                : "text-zinc-600 group-hover:text-zinc-400"
+            }
           />
-        )}
-      </Link>
-    );
-  };
+          <span className="font-medium">{label}</span>
+
+          {active && (
+            <ChevronRight
+              size={14}
+              className="ml-auto text-indigo-500/70"
+            />
+          )}
+        </Link>
+      );
+    }
+  );
+
+  NavLink.displayName = "NavLink";
 
   return (
     <motion.aside
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="flex flex-col h-full w-56 border-r border-white/6 bg-[#090909] px-3 py-4"
+      className="flex flex-col h-full w-56 border-r border-white/6 bg-[#090909] px-3 py-5"
     >
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-2 mb-8">
-        <div className="w-6 h-6 rounded-md bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
-          <Lock size={11} className="text-indigo-400" />
+      <div className="flex items-center gap-3 px-2 mb-10">
+        <div className="w-7 h-7 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center">
+          <Lock size={13} className="text-indigo-400" />
         </div>
-        <span className="text-sm font-medium text-zinc-300">Haven</span>
+        <span className="text-lg font-semibold tracking-tight text-zinc-200">
+          Haven
+        </span>
       </div>
 
-      {/* Main Navigation */}
-      <nav className="flex-1 space-y-0.5">
-        <p className="px-2 mb-2 text-[10px] font-medium tracking-widest text-zinc-600 uppercase">
-          Vault
-        </p>
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1">
+        <div className="px-3 mb-2">
+          <p className="text-[10px] font-semibold tracking-widest text-zinc-600 uppercase">
+            Vault
+          </p>
+        </div>
 
         {navItems.map((item) => (
           <NavLink
@@ -129,10 +140,12 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
           />
         ))}
 
-        <div className="pt-4">
-          <p className="px-2 mb-2 text-[10px] font-medium tracking-widest text-zinc-600 uppercase">
-            Explore
-          </p>
+        <div className="pt-8">
+          <div className="px-3 mb-2">
+            <p className="text-[10px] font-semibold tracking-widest text-zinc-600 uppercase">
+              Explore
+            </p>
+          </div>
 
           {bottomItems.map((item) => (
             <NavLink
@@ -140,21 +153,21 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
               href={item.href}
               icon={item.icon}
               label={item.label}
-              exact // Graph, Audit, Trash are exact matches
+              exact
             />
           ))}
         </div>
       </nav>
 
-      {/* Bottom Section */}
-      <div className="border-t border-white/6 pt-3 mt-3 space-y-1">
+      {/* Bottom Section - Sign Out */}
+      <div className="border-t border-white/6 pt-4 mt-auto">
         <button
           onClick={() => signoutMutation.mutate()}
           disabled={signoutMutation.isPending}
-          className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-zinc-600 hover:text-zinc-400 hover:bg-white/3 transition-all disabled:opacity-50"
+          className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm text-zinc-500 hover:text-zinc-400 hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <LogOut size={13} />
-          Sign out
+          <LogOut size={15} />
+          <span>Sign out</span>
         </button>
       </div>
     </motion.aside>

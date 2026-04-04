@@ -1,26 +1,28 @@
 [config]
 model = "openai/bodh-b0"
-custom_model_max_tokens = 32000
+custom_model_max_tokens = 16000
 fallback_models = []
-ai_timeout = 400
+ai_timeout = 120
 publish_output = true
 
 [github_action_config]
 auto_describe = true
 auto_review = true
-auto_improve = true
+auto_improve = false
 pr_actions = ["opened", "reopened", "ready_for_review", "synchronize"]
 
 [pr_description]
 enable_large_pr_handling = false
+enable_pr_diagram = false
+max_ai_calls = 1
 
 [pr_code_suggestions]
 max_number_of_calls = 1
-parallel_calls = false
+parallel_calls = true
 focus_only_on_problems = true
 
 [pr_reviewer]
-num_max_findings = 3
+num_max_findings = 2
 require_tests_review = false
 require_security_review = false
 require_ticket_analysis_review = false

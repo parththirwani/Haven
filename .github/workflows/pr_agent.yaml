@@ -22,3 +22,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CONFIG.AI_TIMEOUT: "480"
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: "4000"
+          LITELLM_STREAM: "false"

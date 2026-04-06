@@ -23,3 +23,4 @@ jobs:
           CONFIG.AI_TIMEOUT: "480"
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: "4000"
           LITELLM_STREAM: "false"
+          LITELLM_DROP_PARAMS: "stream"

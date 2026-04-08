@@ -3,6 +3,16 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Shield, ArrowRight } from "lucide-react";
+import { useMemo } from "react";
+
+// Static cipher text (computed once)
+const cipherText = Array.from({ length: 16 }, (_, i) =>
+  Array.from({ length: 11 }, (_, j) =>
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="[
+      (i * 11 + j) % 64
+    ]
+  ).join("")
+).join(" ");
 
 export function HeroSection() {
   return (
@@ -109,12 +119,14 @@ export function HeroSection() {
 
 /* Optimized Encryption Orb */
 function EncryptionOrb() {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-
-  const cipherText = Array.from({ length: 16 }, (_, i) =>
-    Array.from({ length: 11 }, (_, j) => chars[(i * 11 + j) % chars.length]).join("")
-  ).join(" ");
+  // Memoize the rotating ring style to prevent recreation
+  const ringStyle = useMemo(
+    () => ({
+      background:
+        "conic-gradient(from 0deg, transparent, rgba(99,102,241,0.12), transparent 70%)",
+    }),
+    []
+  );
 
   return (
     <motion.div
@@ -127,12 +139,9 @@ function EncryptionOrb() {
         {/* Outer rotating ring */}
         <motion.div
           animate={{ rotate: 360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
           className="absolute inset-0 rounded-full border border-indigo-500/10"
-          style={{
-            background:
-              "conic-gradient(from 0deg, transparent, rgba(99,102,241,0.12), transparent 70%)",
-          }}
+          style={ringStyle}
         />
 
         {/* Inner glow orb */}

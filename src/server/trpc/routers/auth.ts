@@ -1,5 +1,4 @@
-// src/server/routers/auth.ts
-import bcrypt from 'bcryptjs';
+import * as argon2 from 'argon2';
 import { prisma } from '@/src/lib/prisma';
 import { publicProcedure, router } from '../trpc';
 import { clearSessionCookie, createSession, SESSION_COOKIE_NAME } from '@/src/utils/session';
@@ -19,7 +18,6 @@ export const authRouter = router({
           where: { email },
           select: { id: true },
         });
-
         if (existingEmail) {
           return { success: false, message: 'Email already in use' };
         }
@@ -29,12 +27,17 @@ export const authRouter = router({
           where: { username },
           select: { id: true },
         });
-
         if (existingUsername) {
           return { success: false, message: 'Username already taken' };
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12);
+        // Hash password with Argon2id (recommended modern standard)
+        const hashedPassword = await argon2.hash(password, {
+          type: argon2.argon2id,
+          memoryCost: 65536,   // 64 MiB
+          timeCost: 3,
+          parallelism: 4,
+        });
 
         // Atomic transaction: create user + session
         const newUser = await prisma.$transaction(async (tx) => {
@@ -45,7 +48,6 @@ export const authRouter = router({
               username,
             },
           });
-
           await createSession(user.id);
           return user;
         });
@@ -76,7 +78,7 @@ export const authRouter = router({
           select: { id: true, password: true },
         });
 
-        if (!user || !(await bcrypt.compare(password, user.password))) {
+        if (!user || !(await argon2.verify(user.password, password))) {
           return { success: false, message: 'Invalid email or password' };
         }
 

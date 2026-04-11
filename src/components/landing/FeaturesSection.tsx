@@ -67,62 +67,14 @@ const accentMap: Record<
   string,
   { text: string; glow: string; gradientFrom: string; gradientTo: string; border: string }
 > = {
-  indigo: {
-    text: "text-indigo-300",
-    glow: "rgba(99,102,241,0.15)",
-    gradientFrom: "from-indigo-500/20",
-    gradientTo: "to-indigo-500/5",
-    border: "rgba(99,102,241,0.25)",
-  },
-  blue: {
-    text: "text-blue-300",
-    glow: "rgba(59,130,246,0.15)",
-    gradientFrom: "from-blue-500/20",
-    gradientTo: "to-blue-500/5",
-    border: "rgba(59,130,246,0.25)",
-  },
-  violet: {
-    text: "text-violet-300",
-    glow: "rgba(139,92,246,0.15)",
-    gradientFrom: "from-violet-500/20",
-    gradientTo: "to-violet-500/5",
-    border: "rgba(139,92,246,0.25)",
-  },
-  amber: {
-    text: "text-amber-300",
-    glow: "rgba(245,158,11,0.15)",
-    gradientFrom: "from-amber-500/20",
-    gradientTo: "to-amber-500/5",
-    border: "rgba(245,158,11,0.25)",
-  },
-  emerald: {
-    text: "text-emerald-300",
-    glow: "rgba(16,185,129,0.15)",
-    gradientFrom: "from-emerald-500/20",
-    gradientTo: "to-emerald-500/5",
-    border: "rgba(16,185,129,0.25)",
-  },
-  pink: {
-    text: "text-pink-300",
-    glow: "rgba(236,72,153,0.15)",
-    gradientFrom: "from-pink-500/20",
-    gradientTo: "to-pink-500/5",
-    border: "rgba(236,72,153,0.25)",
-  },
-  rose: {
-    text: "text-rose-300",
-    glow: "rgba(244,63,94,0.15)",
-    gradientFrom: "from-rose-500/20",
-    gradientTo: "to-rose-500/5",
-    border: "rgba(244,63,94,0.25)",
-  },
-  teal: {
-    text: "text-teal-300",
-    glow: "rgba(20,184,166,0.15)",
-    gradientFrom: "from-teal-500/20",
-    gradientTo: "to-teal-500/5",
-    border: "rgba(20,184,166,0.25)",
-  },
+  indigo: { text: "text-indigo-400", glow: "rgba(99, 102, 241, 0.25)", gradientFrom: "from-indigo-500/30", gradientTo: "to-indigo-500/10", border: "rgba(99,102,241,0.4)" },
+  blue: { text: "text-blue-400", glow: "rgba(59, 130, 246, 0.25)", gradientFrom: "from-blue-500/30", gradientTo: "to-blue-500/10", border: "rgba(59,130,246,0.4)" },
+  violet: { text: "text-violet-400", glow: "rgba(139, 92, 246, 0.25)", gradientFrom: "from-violet-500/30", gradientTo: "to-violet-500/10", border: "rgba(139,92,246,0.4)" },
+  amber: { text: "text-amber-400", glow: "rgba(245, 158, 11, 0.25)", gradientFrom: "from-amber-500/30", gradientTo: "to-amber-500/10", border: "rgba(245,158,11,0.4)" },
+  emerald: { text: "text-emerald-400", glow: "rgba(16, 185, 129, 0.25)", gradientFrom: "from-emerald-500/30", gradientTo: "to-emerald-500/10", border: "rgba(16,185,129,0.4)" },
+  pink: { text: "text-pink-400", glow: "rgba(236, 72, 153, 0.25)", gradientFrom: "from-pink-500/30", gradientTo: "to-pink-500/10", border: "rgba(236,72,153,0.4)" },
+  rose: { text: "text-rose-400", glow: "rgba(244, 63, 94, 0.25)", gradientFrom: "from-rose-500/30", gradientTo: "to-rose-500/10", border: "rgba(244,63,94,0.4)" },
+  teal: { text: "text-teal-400", glow: "rgba(20, 184, 166, 0.25)", gradientFrom: "from-teal-500/30", gradientTo: "to-teal-500/10", border: "rgba(20,184,166,0.4)" },
 };
 
 function FeatureCard({
@@ -139,46 +91,51 @@ function FeatureCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 40 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.55, delay: index * 0.065, ease: [0.25, 0.1, 0.25, 1] }}
-      whileHover={{ y: -3, transition: { duration: 0.2, ease: "easeOut" } }}
-      className="group relative p-5 rounded-2xl cursor-default overflow-hidden"
+      transition={{ duration: 0.6, delay: index * 0.05, ease: [0.23, 1, 0.32, 1] }}
+      whileHover={{ 
+        y: -8, 
+        scale: 1.02,
+        transition: { duration: 0.25, ease: "easeOut" }
+      }}
+      className="group relative p-7 rounded-3xl cursor-default overflow-hidden h-full"
       style={{
-        background:
-          "linear-gradient(135deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.01) 100%)",
-        border: "1px solid rgba(255,255,255,0.07)",
-        backdropFilter: "blur(12px)",
+        background: "linear-gradient(145deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.008) 100%)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        backdropFilter: "blur(16px)",
       }}
     >
-      {/* Hover glow splash */}
+      {/* Stronger interactive glow */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-3xl"
         style={{
-          background: `radial-gradient(ellipse at 30% 20%, ${ac.glow} 0%, transparent 70%)`,
+          background: `radial-gradient(ellipse at 40% 30%, ${ac.glow} 0%, transparent 65%)`,
         }}
       />
 
-      {/* Hover border highlight */}
+      {/* Border highlight */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-3xl"
         style={{
           border: `1px solid ${ac.border}`,
         }}
       />
 
-      {/* Icon */}
-      <div
-        className={`relative w-9 h-9 rounded-xl bg-linear-to-br ${ac.gradientFrom} ${ac.gradientTo} flex items-center justify-center mb-4 ring-1 ring-white/10`}
+      {/* Icon Container */}
+      <motion.div
+        whileHover={{ rotate: 8, scale: 1.15 }}
+        transition={{ duration: 0.4 }}
+        className={`relative w-11 h-11 rounded-2xl bg-gradient-to-br ${ac.gradientFrom} ${ac.gradientTo} flex items-center justify-center mb-6 ring-1 ring-white/10 group-hover:ring-white/20 transition-all`}
       >
-        <Icon size={15} className={ac.text} strokeWidth={1.75} />
-      </div>
+        <Icon size={22} className={ac.text} strokeWidth={1.8} />
+      </motion.div>
 
       {/* Text */}
-      <h3 className="relative text-[13px] font-[490] text-zinc-100 tracking-[-0.01em] mb-1.5">
+      <h3 className="relative text-lg font-medium text-white tracking-[-0.01em] mb-2">
         {feature.title}
       </h3>
-      <p className="relative text-[12px] text-zinc-500 leading-[1.65] font-light">
+      <p className="relative text-[13px] text-zinc-400 leading-relaxed font-light">
         {feature.desc}
       </p>
     </motion.div>
@@ -187,45 +144,51 @@ function FeatureCard({
 
 export function FeaturesSection() {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
     <section
       ref={ref}
-      className="py-28 px-6"
-      style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      className="py-32 px-6 relative overflow-hidden"
+      style={{
+        background: "radial-gradient(circle at 50% 20%, rgba(99,102,241,0.08) 0%, transparent 60%)",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}
     >
-      <div className="max-w-5xl mx-auto">
+      {/* Subtle background grid/pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto relative">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-          className="mb-16"
+          transition={{ duration: 0.7 }}
+          className="text-center mb-20"
         >
-          <div className="flex items-center gap-2 mb-5">
-            <span
-              className="inline-block w-4 h-px"
-              style={{ background: "rgba(99,102,241,0.7)" }}
-            />
-            <p className="text-[10px] font-semibold tracking-[0.18em] text-indigo-400 uppercase">
-              Features
-            </p>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="w-5 h-px bg-indigo-500/70" />
+            <p className="text-xs font-semibold tracking-[0.2em] text-indigo-400 uppercase">Features</p>
+            <div className="w-5 h-px bg-indigo-500/70" />
           </div>
-          <h2
-            className="text-[2rem] font-[320] tracking-[-0.03em] text-white leading-[1.2] max-w-xs"
-            style={{ fontVariationSettings: "'wght' 320" }}
-          >
-            Everything in one
-            <br />
-            <span className="text-zinc-400">encrypted vault.</span>
+
+          <h2 className="text-5xl sm:text-6xl font-light tracking-[-0.04em] text-white leading-[1.1]">
+            Everything in one<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-300 to-zinc-500">
+              encrypted vault
+            </span>
           </h2>
         </motion.div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {features.map((feature, i) => (
-            <FeatureCard key={feature.title} feature={feature} index={i} inView={inView} />
+            <FeatureCard 
+              key={feature.title} 
+              feature={feature} 
+              index={i} 
+              inView={inView} 
+            />
           ))}
         </div>
       </div>

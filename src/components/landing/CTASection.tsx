@@ -1,5 +1,4 @@
 "use client";
-
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
@@ -31,7 +30,6 @@ export function CTASection() {
           <h2 className="text-5xl sm:text-6xl font-light tracking-[-0.03em] text-white mb-6">
             Start keeping secrets
           </h2>
-
           <p className="text-zinc-400 text-lg font-light max-w-md mx-auto mb-12 leading-relaxed">
             Free forever for personal use. <br className="hidden sm:block" />
             No credit card required. No data harvested.
@@ -90,7 +88,7 @@ export function Footer() {
               Sign up
             </Link>
             <a
-              href="https://github.com"
+              href="https://github.com/parththirwani/Haven"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-zinc-200 transition-colors"

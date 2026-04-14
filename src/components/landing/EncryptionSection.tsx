@@ -1,5 +1,4 @@
 "use client";
-
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Key, Server, Eye, Lock } from "lucide-react";
@@ -49,7 +48,7 @@ export function EncryptionSection() {
           transition={{ duration: 0.7 }}
           className="text-center mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-indigo-400 text-xs font-medium tracking-[0.125em] mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-indigo-400 text-xs font-medium tracking-[0.125em] mb-4 hover:border-indigo-500/40 hover:bg-indigo-500/10 transition-colors">
             CRYPTOGRAPHY
           </div>
           <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-white mb-4">
@@ -69,51 +68,66 @@ export function EncryptionSection() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group relative p-8 rounded-3xl border border-white/5 bg-white/3 hover:border-white/10 hover:bg-white/5 transition-all duration-300"
+              className="group relative p-8 rounded-3xl border border-white/5 bg-white/3 
+                         hover:border-white/20 hover:bg-white/5 hover:-translate-y-2 
+                         transition-all duration-500 overflow-hidden"
             >
-              {/* Icon */}
+              {/* Icon Container */}
               <div
-                className={`w-12 h-12 rounded-2xl ${step.bg} flex items-center justify-center mb-6 transition-transform group-hover:scale-110`}
+                className={`w-14 h-14 rounded-2xl ${step.bg} flex items-center justify-center mb-6 
+                           transition-all duration-500 group-hover:scale-110 group-hover:rotate-6`}
               >
-                <step.icon size={22} className={step.color} />
+                <step.icon 
+                  size={26} 
+                  className={`${step.color} transition-all duration-500 group-hover:scale-110`} 
+                />
               </div>
 
               {/* Content */}
-              <h3 className="text-xl font-medium text-white mb-3 tracking-tight">
+              <h3 className="text-xl font-medium text-white mb-3 tracking-tight transition-colors group-hover:text-white">
                 {step.label}
               </h3>
-              <p className="text-zinc-400 text-[15px] leading-relaxed">
+              <p className="text-zinc-400 text-[15px] leading-relaxed transition-colors group-hover:text-zinc-300">
                 {step.desc}
               </p>
 
-              {/* Subtle number indicator */}
-              <div className="absolute top-8 right-8 text-5xl font-light text-white/5 group-hover:text-white/10 transition-colors">
+              {/* Number Indicator */}
+              <div className="absolute top-8 right-8 text-6xl font-light text-white/5 
+                             group-hover:text-white/10 transition-all duration-500">
                 {String(index + 1).padStart(2, "0")}
               </div>
+
+              {/* Subtle glow on hover */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             </motion.div>
           ))}
 
-          {/* Decorative connecting lines (visible only on lg+) */}
+          {/* Decorative connecting lines */}
           <div className="hidden lg:block absolute top-12 left-1/2 w-[calc(100%-6rem)] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
 
-        {/* Code Snippet */}
+        {/* Code Snippet - Enhanced Hover */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.5 }}
-          className="mt-20 rounded-3xl border border-white/6 bg-zinc-950/70 overflow-hidden shadow-xl shadow-black/50"
+          className="mt-20 rounded-3xl border border-white/6 bg-zinc-950/70 overflow-hidden shadow-xl shadow-black/50 
+                     group hover:border-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/10 
+                     transition-all duration-500"
         >
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10 bg-black/40">
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-white/10 bg-black/40 group-hover:bg-black/60 transition-colors">
             <div className="flex gap-1.5">
               <div className="w-3 h-3 rounded-full bg-red-500/60" />
               <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
               <div className="w-3 h-3 rounded-full bg-green-500/60" />
             </div>
-            <span className="ml-2 text-xs font-mono text-zinc-500">crypto.ts — Key Derivation</span>
+            <span className="ml-2 text-xs font-mono text-zinc-500 group-hover:text-zinc-400 transition-colors">
+              crypto.ts — Key Derivation
+            </span>
           </div>
 
-          <pre className="p-8 text-sm font-mono leading-relaxed overflow-x-auto text-zinc-300">
+          <pre className="p-8 text-sm font-mono leading-relaxed overflow-x-auto text-zinc-300 
+                         group-hover:text-zinc-200 transition-colors">
             <code>
               <span className="text-zinc-500">// Master key derivation — client-side only</span>{"\n"}
               {"\n"}
@@ -125,9 +139,9 @@ export function EncryptionSection() {
               <span className="text-amber-400">crypto.subtle.deriveKey</span>
               {"(\n"}
               {"    "}{"{"} name: <span className="text-emerald-300">"PBKDF2"</span>,{"\n"}
-              {"      "}salt: <span className="text-amber-300">new TextEncoder().encode(salt)</span>,{"\n"}
-              {"      "}iterations: <span className="text-indigo-300">310_000</span>,{"\n"}
-              {"      "}hash: <span className="text-emerald-300">"SHA-256"</span>{"\n"}
+              {"     "}salt: <span className="text-amber-300">new TextEncoder().encode(salt)</span>,{"\n"}
+              {"     "}iterations: <span className="text-indigo-300">310_000</span>,{"\n"}
+              {"     "}hash: <span className="text-emerald-300">"SHA-256"</span>{"\n"}
               {"    "}{"}"},{"\n"}
               {"    "}<span className="text-amber-300">new TextEncoder().encode(password)</span>,{"\n"}
               {"    "}{"{"} name: <span className="text-emerald-300">"AES-GCM"</span>, length: 256 {"}"},{"\n"}

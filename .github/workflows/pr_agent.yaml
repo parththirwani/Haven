@@ -16,7 +16,7 @@ jobs:
   pr_agent_auto:
     runs-on: ubuntu-latest
     name: PR-Agent Auto Review
-    if: ${{ github.event_name == 'pull_request' && github.event.sender.type != 'Bot' }}
+    if: github.event_name == 'pull_request' && github.event.sender.type != 'Bot'
     steps:
       - name: PR Agent action step
         uses: Codium-ai/pr-agent@main
@@ -29,6 +29,7 @@ jobs:
           CONFIG.FALLBACK_MODELS:         "[]"
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: "8000"
           CONFIG.AI_TIMEOUT:              "480"
+          CONFIG.USE_REPO_SETTINGS_FILE:  "false"
           GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: "true"
           GITHUB_ACTION_CONFIG.AUTO_REVIEW:   "true"
           GITHUB_ACTION_CONFIG.AUTO_IMPROVE:  "false"
@@ -49,10 +50,10 @@ jobs:
   pr_agent_command:
     runs-on: ubuntu-latest
     name: PR-Agent Command Handler
-    if: >
-      ${{ (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment')
-      && github.event.sender.type != 'Bot'
-      && startsWith(github.event.comment.body, '/') }}
+    if: |
+      (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment') &&
+      github.event.sender.type != 'Bot' &&
+      startsWith(github.event.comment.body, '/')
     steps:
       - name: PR Agent action step
         uses: Codium-ai/pr-agent@main
@@ -65,6 +66,7 @@ jobs:
           CONFIG.FALLBACK_MODELS:         "[]"
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: "8000"
           CONFIG.AI_TIMEOUT:              "480"
+          CONFIG.USE_REPO_SETTINGS_FILE:  "false"
           GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: "false"
           GITHUB_ACTION_CONFIG.AUTO_REVIEW:   "false"
           GITHUB_ACTION_CONFIG.AUTO_IMPROVE:  "false"

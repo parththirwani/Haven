@@ -4,6 +4,7 @@ on:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize]
   issue_comment:
+    types: [created]
 
 permissions:
   issues: write
@@ -14,37 +15,52 @@ jobs:
   pr_agent_job:
     runs-on: ubuntu-latest
     name: PR-Agent Auto Review
-    if: ${{ github.event.sender.type != 'Bot' }}
+
+    if: >
+      (github.event_name == 'pull_request' && github.event.sender.type != 'Bot') ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request != null &&
+       startsWith(github.event.comment.body, '/') &&
+       github.event.sender.type != 'Bot')
+
     steps:
       - name: PR Agent action step
         uses: Codium-ai/pr-agent@main
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI.KEY:      ${{ secrets.OPENAI_KEY }}
-          OPENAI.API_BASE: ${{ secrets.OPENAI_API_BASE }}
 
-          CONFIG.MODEL:                   ${{ secrets.CONFIG_MODEL }}
-          CONFIG.MODEL_REASONING:         ${{ secrets.CONFIG_MODEL }}
-          CONFIG.FALLBACK_MODELS:         "[]"
+          # ✅ FIX: correct key name (this is why it broke)
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
+
+          # Model config (your requirement)
+          CONFIG.MODEL: ${{ secrets.CONFIG_MODEL }}
+          CONFIG.MODEL_REASONING: ${{ secrets.CONFIG_MODEL }}
+          CONFIG.FALLBACK_MODELS: "[]"
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: "8000"
-          CONFIG.AI_TIMEOUT:              "480"
+          CONFIG.AI_TIMEOUT: "480"
 
+          # Actions
           GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: "true"
-          GITHUB_ACTION_CONFIG.AUTO_REVIEW:   "true"
-          GITHUB_ACTION_CONFIG.AUTO_IMPROVE:  "false"
+          GITHUB_ACTION_CONFIG.AUTO_REVIEW: "true"
+          GITHUB_ACTION_CONFIG.AUTO_IMPROVE: "false"
 
-          PR_REVIEWER.NUM_MAX_FINDINGS:            "3"
-          PR_REVIEWER.REQUIRE_TESTS_REVIEW:        "false"
-          PR_REVIEWER.REQUIRE_SECURITY_REVIEW:     "false"
+          # Reviewer
+          PR_REVIEWER.NUM_MAX_FINDINGS: "3"
+          PR_REVIEWER.REQUIRE_TESTS_REVIEW: "false"
+          PR_REVIEWER.REQUIRE_SECURITY_REVIEW: "false"
           PR_REVIEWER.ENABLE_REVIEW_LABELS_EFFORT: "true"
-          PR_REVIEWER.PERSISTENT_COMMENT:          "true"
+          PR_REVIEWER.PERSISTENT_COMMENT: "true"
 
-          PR_DESCRIPTION.PUBLISH_LABELS:       "false"
+          # Description
+          PR_DESCRIPTION.PUBLISH_LABELS: "false"
           PR_DESCRIPTION.FINAL_UPDATE_MESSAGE: "false"
-          PR_DESCRIPTION.ENABLE_PR_DIAGRAM:    "false"
+          PR_DESCRIPTION.ENABLE_PR_DIAGRAM: "false"
 
-          PR_CODE_SUGGESTIONS.MAX_NUMBER_OF_CALLS:            "1"
-          PR_CODE_SUGGESTIONS.PARALLEL_CALLS:                 "false"
-          PR_CODE_SUGGESTIONS.FOCUS_ONLY_ON_PROBLEMS:         "true"
+          # Code suggestions (THIS is what you care about)
+          PR_CODE_SUGGESTIONS.MAX_NUMBER_OF_CALLS: "2"
+          PR_CODE_SUGGESTIONS.PARALLEL_CALLS: "false"
+          PR_CODE_SUGGESTIONS.FOCUS_ONLY_ON_PROBLEMS: "true"
           PR_CODE_SUGGESTIONS.NUM_CODE_SUGGESTIONS_PER_CHUNK: "4"
-          PR_CODE_SUGGESTIONS.PERSISTENT_COMMENT:             "true"
+          PR_CODE_SUGGESTIONS.PERSISTENT_COMMENT: "true"

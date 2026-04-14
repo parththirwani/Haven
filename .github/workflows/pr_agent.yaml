@@ -1,9 +1,11 @@
 name: PR-Agent
-
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, synchronize]
   issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
 
 permissions:
   issues: write
@@ -11,10 +13,10 @@ permissions:
   contents: read
 
 jobs:
-  pr_agent_job:
+  pr_agent_auto:
     runs-on: ubuntu-latest
     name: PR-Agent Auto Review
-    if: ${{ github.event.sender.type != 'Bot' }}
+    if: github.event_name == 'pull_request' && github.event.sender.type != 'Bot'
     steps:
       - name: PR Agent action step
         uses: Codium-ai/pr-agent@main
@@ -22,27 +24,60 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI.KEY:      ${{ secrets.OPENAI_KEY }}
           OPENAI.API_BASE: ${{ secrets.OPENAI_API_BASE }}
-
           CONFIG.MODEL:                   ${{ secrets.CONFIG_MODEL }}
           CONFIG.MODEL_REASONING:         ${{ secrets.CONFIG_MODEL }}
           CONFIG.FALLBACK_MODELS:         "[]"
           CONFIG.CUSTOM_MODEL_MAX_TOKENS: "8000"
           CONFIG.AI_TIMEOUT:              "480"
-
+          CONFIG.USE_REPO_SETTINGS_FILE:  "false"
           GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: "true"
           GITHUB_ACTION_CONFIG.AUTO_REVIEW:   "true"
           GITHUB_ACTION_CONFIG.AUTO_IMPROVE:  "false"
-
           PR_REVIEWER.NUM_MAX_FINDINGS:            "3"
           PR_REVIEWER.REQUIRE_TESTS_REVIEW:        "false"
           PR_REVIEWER.REQUIRE_SECURITY_REVIEW:     "false"
           PR_REVIEWER.ENABLE_REVIEW_LABELS_EFFORT: "true"
           PR_REVIEWER.PERSISTENT_COMMENT:          "true"
-
           PR_DESCRIPTION.PUBLISH_LABELS:       "false"
           PR_DESCRIPTION.FINAL_UPDATE_MESSAGE: "false"
           PR_DESCRIPTION.ENABLE_PR_DIAGRAM:    "false"
+          PR_CODE_SUGGESTIONS.MAX_NUMBER_OF_CALLS:            "1"
+          PR_CODE_SUGGESTIONS.PARALLEL_CALLS:                 "false"
+          PR_CODE_SUGGESTIONS.FOCUS_ONLY_ON_PROBLEMS:         "true"
+          PR_CODE_SUGGESTIONS.NUM_CODE_SUGGESTIONS_PER_CHUNK: "4"
+          PR_CODE_SUGGESTIONS.PERSISTENT_COMMENT:             "true"
 
+  pr_agent_command:
+    runs-on: ubuntu-latest
+    name: PR-Agent Command Handler
+    if: |
+      (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment') &&
+      github.event.sender.type != 'Bot' &&
+      startsWith(github.event.comment.body, '/')
+    steps:
+      - name: PR Agent action step
+        uses: Codium-ai/pr-agent@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI.KEY:      ${{ secrets.OPENAI_KEY }}
+          OPENAI.API_BASE: ${{ secrets.OPENAI_API_BASE }}
+          CONFIG.MODEL:                   ${{ secrets.CONFIG_MODEL }}
+          CONFIG.MODEL_REASONING:         ${{ secrets.CONFIG_MODEL }}
+          CONFIG.FALLBACK_MODELS:         "[]"
+          CONFIG.CUSTOM_MODEL_MAX_TOKENS: "8000"
+          CONFIG.AI_TIMEOUT:              "480"
+          CONFIG.USE_REPO_SETTINGS_FILE:  "false"
+          GITHUB_ACTION_CONFIG.AUTO_DESCRIBE: "false"
+          GITHUB_ACTION_CONFIG.AUTO_REVIEW:   "false"
+          GITHUB_ACTION_CONFIG.AUTO_IMPROVE:  "false"
+          PR_REVIEWER.NUM_MAX_FINDINGS:            "3"
+          PR_REVIEWER.REQUIRE_TESTS_REVIEW:        "false"
+          PR_REVIEWER.REQUIRE_SECURITY_REVIEW:     "false"
+          PR_REVIEWER.ENABLE_REVIEW_LABELS_EFFORT: "true"
+          PR_REVIEWER.PERSISTENT_COMMENT:          "true"
+          PR_DESCRIPTION.PUBLISH_LABELS:       "false"
+          PR_DESCRIPTION.FINAL_UPDATE_MESSAGE: "false"
+          PR_DESCRIPTION.ENABLE_PR_DIAGRAM:    "false"
           PR_CODE_SUGGESTIONS.MAX_NUMBER_OF_CALLS:            "1"
           PR_CODE_SUGGESTIONS.PARALLEL_CALLS:                 "false"
           PR_CODE_SUGGESTIONS.FOCUS_ONLY_ON_PROBLEMS:         "true"

@@ -1,5 +1,4 @@
 "use client";
-
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -16,30 +15,30 @@ export function LandingNav() {
       }}
     >
       {/* Logo */}
-      <Link 
-        href="/" 
-        className="flex items-center gap-2.5 group"
+      <Link
+        href="/"
+        className="flex items-center gap-3 group"
         aria-label="Haven homepage"
       >
-        <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center group-hover:bg-indigo-500/20 group-hover:border-indigo-500/40 transition-all duration-200">
-          <span className="text-base">🔒</span>
+        <div className="w-9 h-9 rounded-2xl bg-linear-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-300">
+          <span className="text-2xl drop-shadow-sm">🔒</span>
         </div>
-        <span className="text-lg font-semibold tracking-tight text-white">
+        <span className="text-2xl font-semibold tracking-tighter text-white">
           Haven
         </span>
       </Link>
 
-      {/* Desktop Navigation Links */}
-      <div className="hidden md:flex items-center gap-8 text-sm">
-        <a 
-          href="#encryption" 
-          className="text-zinc-400 hover:text-zinc-100 transition-colors duration-200"
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex items-center gap-10 text-sm font-medium">
+        <a
+          href="#encryption"
+          className="text-zinc-400 hover:text-white transition-colors duration-200 relative after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all hover:after:w-full"
         >
           Security
         </a>
-        <a 
-          href="#features" 
-          className="text-zinc-400 hover:text-zinc-100 transition-colors duration-200"
+        <a
+          href="#features"
+          className="text-zinc-400 hover:text-white transition-colors duration-200 relative after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-0 after:bg-white after:transition-all hover:after:w-full"
         >
           Features
         </a>
@@ -49,16 +48,16 @@ export function LandingNav() {
       <div className="flex items-center gap-3">
         <Link
           href="/login"
-          className="text-sm text-zinc-400 hover:text-zinc-100 px-4 py-2 transition-colors duration-200"
+          className="px-5 py-2.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors duration-200"
         >
           Sign in
         </Link>
 
         <Link
           href="/signup"
-          className="px-5 py-2.5 rounded-xl bg-white text-sm font-medium text-zinc-900 hover:bg-zinc-100 active:bg-zinc-200 transition-all duration-200 shadow-sm"
+          className="px-6 py-2.5 rounded-2xl bg-white text-sm font-semibold text-zinc-900 hover:bg-zinc-100 active:bg-zinc-200 transition-all duration-200 shadow-lg shadow-white/10"
         >
-          Get started
+          Get started free
         </Link>
       </div>
     </motion.nav>

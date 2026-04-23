@@ -1,4 +1,3 @@
-// src/server/routers/auth.ts
 import bcrypt from 'bcryptjs';
 import { prisma } from '@/src/lib/prisma';
 import { publicProcedure, router } from '../trpc';

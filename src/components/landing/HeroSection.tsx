@@ -2,163 +2,139 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Shield, ArrowRight } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 pt-20">
-      {/* Background Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        {/* Radial Glow */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 65% 45% at 50% 40%, rgba(99, 102, 241, 0.09) 0%, transparent 70%)",
-          }}
-        />
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-6 pt-20 bg-[#06060A]">
 
-        {/* Subtle Grid */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)
-            `,
-            backgroundSize: "64px 64px",
-          }}
-        />
-      </div>
+      {/* Halftone dot grid */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(ellipse 75% 70% at 50% 50%, black 40%, transparent 100%)",
+        }}
+      />
 
-      {/* Encryption Orb */}
-      <EncryptionOrb />
+      {/* Amber horizon bloom */}
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 pointer-events-none"
+        style={{
+          width: "70%",
+          height: "420px",
+          background: "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(251,191,36,0.07) 0%, transparent 70%)",
+        }}
+      />
 
-      {/* Badge */}
+      {/* Rotating ring ornament */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="mb-8 flex items-center gap-2 px-4 py-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/5 text-indigo-400 text-sm font-medium tracking-wide"
+        className="absolute top-24 left-[7%] hidden xl:block pointer-events-none"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
       >
-        <Shield size={14} />
-        End-to-end encrypted
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <circle cx="32" cy="32" r="30" stroke="rgba(251,191,36,0.15)" strokeWidth="0.75" strokeDasharray="4 6" />
+          <circle cx="32" cy="32" r="20" stroke="rgba(251,191,36,0.08)" strokeWidth="0.75" />
+          <circle cx="32" cy="32" r="3" fill="rgba(251,191,36,0.3)" />
+        </svg>
+      </motion.div>
+
+      {/* Terminal badge */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="mb-10 flex items-center gap-2.5 px-5 py-2 rounded border border-amber-500/20 bg-amber-500/5"
+        style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
+      >
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+        <span className="text-amber-400 text-[11px] tracking-[0.15em] uppercase">
+          E2E Encrypted · Zero Knowledge
+        </span>
       </motion.div>
 
       {/* Headline */}
       <motion.h1
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 36 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.1 }}
-        className="text-center text-5xl sm:text-6xl md:text-7xl font-light tracking-[-0.04em] text-white max-w-4xl leading-[1.05]"
+        transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        className="text-center font-light tracking-[-0.045em] text-white max-w-3xl leading-[1.02]"
+        style={{ fontSize: "clamp(3rem, 8vw, 5.5rem)" }}
       >
-        Your second brain,{" "}
-        <span className="text-zinc-500">yours alone.</span>
+        Your second brain.
+        <br />
+        <span
+          style={{
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            backgroundImage: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 40%, #d97706 100%)",
+          }}
+        >
+          Cryptographically
+        </span>
+        <br />
+        <span className="text-white/30">yours alone.</span>
       </motion.h1>
 
       {/* Subheadline */}
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.3 }}
-        className="mt-6 text-center text-lg md:text-xl text-zinc-400 max-w-xl leading-relaxed font-light"
+        transition={{ duration: 0.7, delay: 0.35 }}
+        className="mt-8 text-center text-[17px] text-zinc-500 max-w-sm leading-relaxed font-light"
       >
-        Notes, links, passwords, and resources — all encrypted before they
-        leave your device. We never see your data.
+        Notes, links, passwords, files — all encrypted client-side.
+        We store noise.
       </motion.p>
 
-      {/* CTA Buttons */}
+      {/* CTAs */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.5 }}
-        className="mt-10 flex flex-col sm:flex-row items-center gap-4"
+        transition={{ duration: 0.6, delay: 0.55 }}
+        className="mt-12 flex flex-col sm:flex-row items-center gap-3"
       >
         <Link
           href="/signup"
-          className="group flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-indigo-500 hover:bg-indigo-400 text-white text-base font-medium transition-all duration-200 active:scale-[0.985]"
+          className="group relative flex items-center gap-2.5 px-7 py-3.5 rounded-lg text-sm font-medium text-black transition-all duration-200 active:scale-[0.982] overflow-hidden"
+          style={{ background: "linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)" }}
         >
-          Get started free
+          <span className="relative z-10">Create your vault</span>
           <ArrowRight
-            size={18}
-            className="group-hover:translate-x-1 transition-transform"
+            size={15}
+            className="relative z-10 group-hover:translate-x-0.5 transition-transform"
+          />
+          <div
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            style={{ background: "linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%)" }}
           />
         </Link>
 
         <Link
           href="/login"
-          className="px-8 py-3.5 rounded-2xl border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 text-base font-medium transition-all duration-200"
+          className="px-7 py-3.5 rounded-lg border border-white/10 text-zinc-500 hover:text-white hover:border-white/20 text-sm font-medium transition-all duration-200"
         >
           Sign in
         </Link>
       </motion.div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.4, duration: 1 }}
-        className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+        transition={{ delay: 1.6, duration: 1 }}
+        className="absolute bottom-14 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
       >
-        <div className="w-px h-14 bg-gradient-to-b from-transparent via-zinc-600 to-transparent" />
-        <span className="text-[10px] text-zinc-500 tracking-widest">SCROLL</span>
+        <motion.div
+          animate={{ scaleY: [0.4, 1, 0.4] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="w-px h-12 origin-top"
+          style={{ background: "linear-gradient(to bottom, rgba(251,191,36,0.5), transparent)" }}
+        />
       </motion.div>
     </section>
-  );
-}
-
-/* Optimized Encryption Orb */
-function EncryptionOrb() {
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-
-  const cipherText = Array.from({ length: 16 }, (_, i) =>
-    Array.from({ length: 11 }, (_, j) => chars[(i * 11 + j) % chars.length]).join("")
-  ).join(" ");
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.85 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 1.4, delay: 0.2 }}
-      className="absolute top-[15%] right-[6%] hidden xl:block pointer-events-none"
-    >
-      <div className="relative w-56 h-56">
-        {/* Outer rotating ring */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-0 rounded-full border border-indigo-500/10"
-          style={{
-            background:
-              "conic-gradient(from 0deg, transparent, rgba(99,102,241,0.12), transparent 70%)",
-          }}
-        />
-
-        {/* Inner glow orb */}
-        <div
-          className="absolute inset-8 rounded-full"
-          style={{
-            background:
-              "radial-gradient(circle at 40% 30%, rgba(129, 140, 248, 0.18) 0%, transparent 65%)",
-          }}
-        />
-
-        {/* Cipher text */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="font-mono text-[7.5px] text-indigo-500/25 leading-none text-center tracking-widest select-none"
-            style={{ maxWidth: "138px", lineHeight: "1.35" }}
-          >
-            {cipherText}
-          </div>
-        </div>
-
-        {/* Central Shield */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Shield size={26} className="text-indigo-400/70" />
-        </div>
-      </div>
-    </motion.div>
   );
 }

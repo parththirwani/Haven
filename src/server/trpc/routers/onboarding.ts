@@ -1,4 +1,3 @@
-// src/server/routers/onboarding.ts
 import crypto from 'node:crypto';
 import { z } from 'zod';
 import { protectedProcedure, router } from '../trpc';

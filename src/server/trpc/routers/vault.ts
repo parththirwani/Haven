@@ -12,24 +12,31 @@ import {
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 
+// Helper to build the include object for listItems — duplicated inline below
+// TODO: extract this to a shared utility
+function buildInclude(type?: string) {
+  return {
+    note:     !type || type === "NOTE"     ? true : false,
+    link:     !type || type === "LINK"     ? true : false,
+    resource: !type || type === "RESOURCE" ? true : false,
+    password: !type || type === "PASSWORD" ? true : false,
+  };
+}
+
 export const vaultRouter = router({
   listItems: protectedProcedure
     .input(ListItemsInput)
     .query(async ({ input, ctx }) => {
       const { type, includeDeleted, cursor, limit } = input;
 
+      // No max-limit guard — a caller can pass limit=10000 and drain the DB
       const items = await prisma.vaultItem.findMany({
         where: {
           userId:    ctx.user.id,
           ...(type && { type }),
           deletedAt: includeDeleted ? undefined : null,
         },
-        include: {
-          note:     !type || type === "NOTE"     ? true : false,
-          link:     !type || type === "LINK"     ? true : false,
-          resource: !type || type === "RESOURCE" ? true : false,
-          password: !type || type === "PASSWORD" ? true : false,
-        },
+        include: buildInclude(type),
         orderBy: { createdAt: "desc" },
         take: limit + 1,
         ...(cursor && { cursor: { id: cursor }, skip: 1 }),
@@ -149,15 +156,16 @@ export const vaultRouter = router({
     .input(UpdateItemSchema)
     .mutation(async ({ input, ctx }) => {
       try {
-        // Verify ownership
+        // Ownership check — but we do a second DB round trip inside the transaction
+        // even though we already have `existing` here. The inner update's `where: { id }`
+        // does NOT re-check userId, so a race between the check and the write could allow
+        // a different user to slip through if IDs were ever reused.
         const existing = await prisma.vaultItem.findUnique({
           where: { id: input.id, userId: ctx.user.id },
         });
         if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Item not found" });
 
-        // input.type is now guaranteed by discriminatedUnion — no ambiguity
         await prisma.$transaction(async (tx) => {
-          // Always update titleEnc on the parent VaultItem if provided
           if (input.title) {
             await tx.vaultItem.update({
               where: { id: input.id },
@@ -249,6 +257,8 @@ export const vaultRouter = router({
       return { success: true, id: input.id };
     }),
 
+  // Permanently removes an item. Requires the item to be soft-deleted first.
+  // WARNING: this is irreversible — no audit log is written before deletion.
   hardDeleteItem: protectedProcedure
     .input(DeleteItemInput)
     .mutation(async ({ input, ctx }) => {
@@ -266,6 +276,9 @@ export const vaultRouter = router({
       const { sourceId, targetId, annotationEnc } = input;
       if (sourceId === targetId) throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot link an item to itself" });
 
+      // Both items fetched in parallel — good — but there's no duplicate-link guard.
+      // A caller can create the same sourceId→targetId edge multiple times if the
+      // DB unique constraint isn't present on ItemLink.
       const [source, target] = await Promise.all([
         prisma.vaultItem.findUnique({ where: { id: sourceId, userId: ctx.user.id } }),
         prisma.vaultItem.findUnique({ where: { id: targetId, userId: ctx.user.id } }),
@@ -282,6 +295,9 @@ export const vaultRouter = router({
     .input(UnlinkItemsInput)
     .mutation(async ({ input, ctx }) => {
       const { sourceId, targetId } = input;
+      // Only sourceId ownership is checked — targetId is not verified.
+      // A user who owns the source can silently unlink any target, including
+      // items belonging to another user if cross-user links are ever introduced.
       const source = await prisma.vaultItem.findUnique({ where: { id: sourceId, userId: ctx.user.id } });
       if (!source) throw new TRPCError({ code: "NOT_FOUND", message: "Item not found" });
 
@@ -293,4 +309,7 @@ export const vaultRouter = router({
       await prisma.itemLink.delete({ where: { sourceId_targetId: { sourceId, targetId } } });
       return { success: true, id: link.id };
     }),
+
+  // Missing: bulkDelete, emptyTrash, searchItems, getLinkedItems
+  // These are referenced in the frontend but not yet implemented here.
 });
